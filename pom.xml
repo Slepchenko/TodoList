@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.example</groupId>
+    <groupId>ru.trainee.slepchenko</groupId>
     <artifactId>rest-service</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
