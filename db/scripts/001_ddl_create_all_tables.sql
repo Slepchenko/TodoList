@@ -49,3 +49,6 @@ insert into categories(name) values ('Категория_2');
 insert into categories(name) values ('Категория_3');
 insert into categories(name) values ('Категория_4');
 
+insert into todo_roles(name) values ('admin');
+insert into todo_roles(name) values ('user');
+

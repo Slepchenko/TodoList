@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en" xmlns:th="" xmlns:text-align="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+    <title>Задание</title>
+</head>
+<body>
+<div class="container-fluid p-1">
+    <div class="col-6 ms-1">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="d-flex" th:if="${user.name == 'Гость'}">
+                <a class="nav-link text-secondary me-3" th:href="@{/users/register}">Регистрация</a>
+                <a class="nav-link text-secondary" th:href="@{/users/login}">Войти</a>
+            </div>
+            <div class="d-flex" th:if="${user.name != 'Гость'}">
+                <a class="nav-link text-secondary me-3" href="#" th:text="${user.name}"
+                   th:href="@{/tasks/allTasks}"></a>
+                <a class="nav-link text-secondary" th:href="@{/users/logout}">Выйти</a>
+            </div>
+        </nav>
+        <div class="container-fluid p-0">
+            <b><h1>Редактирование задачи</h1></b>
+        </div>
+        <form class="mt-3" th:action="@{/tasks/update}" method="post" enctype="multipart/form-data">
+            <input type="hidden" class="form-control" id="id" name="id" th:value="${task.id}"/>
+            <input type="hidden" class="form-control" id="done" name="done" th:value="${task.done}"/>
+            <div class="mb-3">
+                <input type="text" class="form-control" id="name" name="name"
+                       th:value="${task.name}">
+            </div>
+            <div class="mb-3">
+                <textarea class="form-control" id="description" name="description" rows="25"
+                          placeholder="Подробное описание задачи" th:text="${task.description}"></textarea>
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" name="priority_status" class="form-check-input" id="priority_status"
+                       th:checked="${task.priority.name == 'urgently'}">
+                <label class="form-check-label" for="priority_status">Срочная задача</label>
+            </div>
+            <div class="mb-4 row">
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-4">
+                            <button><a class="btn w-100" th:href="@{/tasks/allTasks}"
+                                       style="background-color: #FF6633; color: black;">Отмена</a></button>
+                        </div>
+                        <div>
+                            <button><a class="btn w-100" type="submit"
+                                       style="background-color: #99CCFF; color: black;">Сохранить</a></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
