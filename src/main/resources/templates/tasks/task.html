@@ -1,19 +1,11 @@
 <!doctype html>
-<html lang="en" xmlns:th="" xmlns:text-align="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-            crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-            crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="/css/style.css"/>
     <title>Задание</title>
 </head>
 <body>
@@ -24,52 +16,41 @@
             <a class="nav-link text-secondary" th:href="@{/users/login}">Войти</a>
         </div>
         <div class="d-flex" th:if="${user.name != 'Гость'}">
-            <a class="nav-link text-secondary me-3" href="#" th:text="${user.name}"
-               th:href="@{/tasks/allTasks}"></a>
+            <a class="nav-link text-secondary me-3" href="#" th:text="${user.name}" th:href="@{/tasks/allTasks}"></a>
             <a class="nav-link text-secondary" th:href="@{/users/logout}">Выйти</a>
         </div>
     </nav>
-    <div>
-        <div class="col">
-            <b><span th:text="${responsible}"></span></b>
+
+    <div class="task-container">
+        <div class="task-header">
+            <h2>
+                <span th:text="${task.name}"></span>
+                <span th:if="${task.done}" style="color: green;">✔</span>
+                <span th:if="${!task.done}" style="color: red;">✘</span>
+            </h2>
+            <div>
+                <a class="btn status-btn" th:href="@{/tasks/changeStatus/{id}(id=${task.id})}"
+                   th:classappend="${task.done} ? 'not-done' : 'done'"
+                   th:text="${task.done ? 'Ещё не выполнено' : 'Выполнить'}"></a>
+            </div>
         </div>
 
-        <div th:each="category : ${categories}">
-            <div th:text="${category.name}"></div>
+        <div class="task-meta">
+            <span><b>Ответственный:</b> <span th:text="${responsible}"></span></span>
+            <span><b>Дата создания:</b> <span th:text="${#temporals.format(task.created, 'dd.MM.yyyy')}"></span></span>
         </div>
 
-        <br>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <h2 th:text="${task.name}" style="margin-bottom: 0;"></h2>
-            <div class="col-2">
-                <div th:if="${task.done == false}"><a class="btn w-10" th:href="@{/tasks/changeStatus/{id}(id=${task.id})}">Выполнить</a></div>
-                <div th:if="${task.done == true}"><a class="btn w-10" th:href="@{/tasks/changeStatus/{id}(id=${task.id})}">&#10003;</a></div>
-            </div>
-<!--            &#10003;-->
+        <div class="task-categories">
+            <span><b>Категории:</b></span>
+            <span th:each="category : ${categories}" class="category-badge" th:text="${category.name}"></span>
         </div>
-        <br>
-        <div>
-            <p th:text="${#temporals.format(task.created, 'dd.MM.yyy')}">
-            <p th:text="${task.description}" style="margin-bottom: 40px;"><br>
-        </div>
-        <div class="mb-3 row">
-            <div class="d-flex justify-content-between">
-                <div class="col">
-                    <a class="btn w-100"
-                       th:href="@{/tasks/updatePage/{id}(id=${task.id})}"
-                       style="background-color: #99CCFF; color: black;">Редактировать
-                    </a>
-                </div>
-                <div class="col ms-2">
-                    <a class="btn w-100"
-                       th:href="@{/tasks/delete/{id}(id=${task.id})}" style="background-color: #FF6633; color: black;">Удалить
-                    </a>
-                </div>
-                <div class="col ms-2">
-                    <a class="btn" th:href="@{/tasks/allTasks}" style="background-color: #F0F8FF; color: black;">Назад
-                    </a>
-                </div>
-            </div>
+
+        <p class="task-description" th:text="${task.description}"></p>
+
+        <div class="task-actions">
+            <a class="btn edit-btn" th:href="@{/tasks/updatePage/{id}(id=${task.id})}">Редактировать</a>
+            <a class="btn delete-btn" th:href="@{/tasks/delete/{id}(id=${task.id})}">Удалить</a>
+            <a class="btn back-btn" th:href="@{/tasks/allTasks}">Назад</a>
         </div>
     </div>
 </div>

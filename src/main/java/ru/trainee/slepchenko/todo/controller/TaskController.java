@@ -87,7 +87,6 @@ public class TaskController {
         model.addAttribute("task", task);
         model.addAttribute("responsible", task.getUser().getName());
         model.addAttribute("categories", task.getCategories());
-
         return "tasks/task";
     }
 
@@ -118,10 +117,7 @@ public class TaskController {
     }
 
     @PostMapping("/update")
-    public String update(Model model,
-                         HttpSession session,
-                         @ModelAttribute Task task,
-                         @RequestParam(name = "priority_status", defaultValue = "false") boolean isUrgentlyTask) {
+    public String update(Model model, HttpSession session, @ModelAttribute Task task) {
         AddUserModel.checkInMenu(model, session);
         boolean isUpdated = taskService.update(task);
         if (!isUpdated) {

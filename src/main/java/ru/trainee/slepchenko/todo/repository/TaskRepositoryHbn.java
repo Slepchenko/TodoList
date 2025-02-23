@@ -32,17 +32,6 @@ public class TaskRepositoryHbn implements TaskRepository {
         );
     }
 
-//    @Override
-//    public Collection<Task> findByDateRange(LocalDate startDate, LocalDate endDate) {
-//        return crudRepository.query(
-//                "select distinct t from Task t "
-//                        + "left join fetch t.categories "
-//                        + "where t.completion between :tStartDate and :tEndDate",
-//                Task.class,
-//                Map.of("tStartDate", startDate, "tEndDate", endDate)
-//        );
-//    }
-
     @Override
     public Collection<Task> findByDateAndStatus(LocalDate startDate, LocalDate endDate, boolean done) {
         return  crudRepository.query(
