@@ -6,9 +6,11 @@ import ru.trainee.slepchenko.todo.model.Task;
 import ru.trainee.slepchenko.todo.repository.TaskRepository;
 
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -27,13 +29,8 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public Collection<Task> findDone() {
-        return taskRepository.findDone();
-    }
-
-    @Override
-    public Collection<Task> findNew() {
-        return taskRepository.findNew();
+    public Collection<Task> findByDateAndStatus(LocalDate startDate, LocalDate endDate, boolean done) {
+        return taskRepository.findByDateAndStatus(startDate, endDate, done);
     }
 
     @Override
@@ -52,8 +49,9 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public boolean changeStatusToTrue(int id) {
-        return taskRepository.changeStatusToTrue(id);
+    public boolean changeStatus(int id, boolean status) {
+
+        return taskRepository.changeStatus(id, status);
     }
 
 }

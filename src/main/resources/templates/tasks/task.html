@@ -30,11 +30,8 @@
         </div>
     </nav>
     <div>
-        <div class="col">Ответственный за выполнение
-            <b><span th:text="${responsible}"></span></b>
-        </div>
         <div class="col">
-            <span th:if="${priority == 'urgently'}"><b>Срочная задача</b>&#10071;</span>
+            <b><span th:text="${responsible}"></span></b>
         </div>
 
         <div th:each="category : ${categories}">
@@ -45,10 +42,10 @@
         <div style="display: flex; align-items: center; gap: 10px;">
             <h2 th:text="${task.name}" style="margin-bottom: 0;"></h2>
             <div class="col-2">
-                <a class="btn w-10" th:href="@{/tasks/changeStatus/{id}(id=${task.id})}"
-                   style="background-color: #4CAF50; color: white;">&#10003;
-                </a>
+                <div th:if="${task.done == false}"><a class="btn w-10" th:href="@{/tasks/changeStatus/{id}(id=${task.id})}">Выполнить</a></div>
+                <div th:if="${task.done == true}"><a class="btn w-10" th:href="@{/tasks/changeStatus/{id}(id=${task.id})}">&#10003;</a></div>
             </div>
+<!--            &#10003;-->
         </div>
         <br>
         <div>

@@ -16,7 +16,6 @@
         <mapping class="ru.trainee.slepchenko.todo.model.Task"/>
         <mapping class="ru.trainee.slepchenko.todo.model.User"/>
         <mapping class="ru.trainee.slepchenko.todo.model.Role"/>
-        <mapping class="ru.trainee.slepchenko.todo.model.Priority"/>
         <mapping class="ru.trainee.slepchenko.todo.model.Category"/>
     </session-factory>
 </hibernate-configuration>

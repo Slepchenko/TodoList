@@ -1,6 +1,7 @@
 package ru.trainee.slepchenko.todo.model;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -26,15 +28,14 @@ public class Task {
 
     private LocalDateTime created = LocalDateTime.now();
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate completion;
+
     private boolean done;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "priority_id")
-    private Priority priority;
 
     @ManyToMany
     @JoinTable(

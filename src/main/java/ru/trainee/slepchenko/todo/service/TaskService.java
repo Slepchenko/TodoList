@@ -4,6 +4,7 @@ package ru.trainee.slepchenko.todo.service;
 
 import ru.trainee.slepchenko.todo.model.Task;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -13,9 +14,7 @@ public interface TaskService {
 
     Collection<Task> findAll();
 
-    Collection<Task> findDone();
-
-    Collection<Task> findNew();
+    Collection<Task> findByDateAndStatus(LocalDate startDate, LocalDate endDate, boolean done);
 
     Task save(Task task);
 
@@ -23,6 +22,6 @@ public interface TaskService {
 
     boolean update(Task task);
 
-    boolean changeStatusToTrue(int id);
+    boolean changeStatus(int id, boolean status);
 
 }

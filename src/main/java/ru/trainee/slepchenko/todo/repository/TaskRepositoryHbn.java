@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.trainee.slepchenko.todo.model.Task;
 
-import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -18,43 +18,39 @@ public class TaskRepositoryHbn implements TaskRepository {
     @Override
     public Optional<Task> findById(int id) {
         return crudRepository.optional(
-                "from Task t "
-                        + "join fetch t.categories "
-                        + "join fetch t.priority where t.id = :fId",
+                "from Task t left join fetch t.categories where t.id = :tId",
                 Task.class,
-                Map.of("fId", id)
+                Map.of("tId", id)
         );
     }
 
     @Override
     public Collection<Task> findAll() {
         return crudRepository.query(
-                "select distinct t from Task t "
-                        + "join fetch t.priority "
-                        + "join fetch t.categories "
-                        + "order by t.priority.id, created desc",
+                "select distinct t from Task t left join fetch t.categories",
                 Task.class
         );
     }
 
-    @Transactional
-    @Override
-    public Collection<Task> findDone() {
-        return crudRepository.query(
-                "select distinct t from Task t "
-                        + "join fetch t.priority "
-                        + "join fetch t.categories where done = true order by t.priority.id, created desc",
-                Task.class
-        );
-    }
+//    @Override
+//    public Collection<Task> findByDateRange(LocalDate startDate, LocalDate endDate) {
+//        return crudRepository.query(
+//                "select distinct t from Task t "
+//                        + "left join fetch t.categories "
+//                        + "where t.completion between :tStartDate and :tEndDate",
+//                Task.class,
+//                Map.of("tStartDate", startDate, "tEndDate", endDate)
+//        );
+//    }
 
     @Override
-    public Collection<Task> findNew() {
-        return crudRepository.query(
+    public Collection<Task> findByDateAndStatus(LocalDate startDate, LocalDate endDate, boolean done) {
+        return  crudRepository.query(
                 "select distinct t from Task t "
-                        + "join fetch t.priority "
-                        + "join fetch t.categories where t.done = false order by t.priority.id, created desc",
-                Task.class
+                        + "left join fetch t.categories "
+                        + "where t.completion between :tStartDate and :tEndDate and t.done = :tDone",
+                Task.class,
+                Map.of("tStartDate", startDate, "tEndDate", endDate, "tDone", done)
         );
     }
 
@@ -75,20 +71,21 @@ public class TaskRepositoryHbn implements TaskRepository {
     @Override
     public boolean update(Task task) {
         return crudRepository.query(
-                "update from Task set name = :fName, description = :fDescription, priority = :fPriority where id = :fId",
-                Map.of("fName",
+                "update from Task set name = :fName, description = :fDescription where id = :fId",
+                Map.of("fId",
+                        task.getId(),
+                        "fName",
                         task.getName(),
                         "fDescription",
-                        task.getDescription(),
-                        "fId", task.getId(), "fPriority", task.getPriority())
+                        task.getDescription())
         );
     }
 
     @Override
-    public boolean changeStatusToTrue(int id) {
+    public boolean changeStatus(int id, boolean status) {
         return crudRepository.query(
-                "update from Task set done = true where id = :fId",
-                Map.of("fId", id)
+                "update from Task set done = :fStatus where id = :fId",
+                Map.of("fId", id, "fStatus", status)
         );
     }
 

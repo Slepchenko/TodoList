@@ -41,58 +41,65 @@
                     <input type="text" class="form-control" id="name" name="name" placeholder="Краткое описание задания"
                            required style="width: 420px;">
                 </div>
-                <input type="hidden" class="form-control" id="priority" name="priority.id" th:value="2"/>
-
-                <div class="form-check mb-3">
-                    <input type="checkbox" name="priority_status" class="form-check-input" id="priority_status">
-                    <label class="form-check-label" for="priority_status">Срочная задача</label>
-                </div>
-
                 <div>
                     <label>Выберите категории:</label>
                     <div th:each="category : ${categories}">
                         <label>
-                            <input type="checkbox" name="categories" th:value="${category.id}" />
+                            <input type="checkbox" name="categories" th:value="${category.id}"/>
                             <span th:text="${category.name}"></span>
                         </label>
                     </div>
                 </div>
-
+                <div class="col-completion">
+                    <label for="completion">Дата выполнения:</label>
+                    <input type="date" id="completion" class="form-control" name="completion" required>
+                </div>
             </div>
             <br>
-            <div class="d-flex align-items-center">
-                <div class="col-3"><a class="btn btn-info w-100" th:href="@{/tasks/allTasks}">Все задания</a></div>
-                <div class="col-3"><a class="btn btn-info w-100" th:href="@{/tasks/newTasks}">Новые задания</a></div>
-                <div class="col-3"><a class="btn btn-info w-100" th:href="@{/tasks/doneTasks}">Выполненные задания</a>
-                </div>
-            </div>
-            <div class="container">
-                <div class="row" style="margin-left: -130px; margin-right: 220px;">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">Задача</th>
-                            <th scope="col">Дата</th>
-                            <th scope="col">Статус</th>
-                            <th scope="col">Срочность</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="task: ${tasks}">
-                            <td><a th:text="${task.name}" th:href="@{/tasks/{taskId}(taskId=${task.id})}"></a></td>
-                            <td th:text="${#temporals.format(task.created, 'dd.MM.yyy')}"></td>
-                            <td th:if="${task.done == true}">&#9989;</td>
-                            <td th:if="${task.done == false}">Ожидание выполнения</td>
-                            <th th:if="${task.priority.name == 'urgently'}">&#10071;</th>
-                            <th th:if="${task.priority.name == 'normal'}"></th>
-
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </form>
+    <div>
+        <form th:action="@{/tasks/filter}" method="get">
+            <label for="period">Период:</label>
+            <select name="period" id="period">
+                <option value="today">Сегодня</option>
+                <option value="week">Неделя</option>
+                <option value="month">Месяц</option>
+            </select>
+
+            <label for="done">Статус:</label>
+            <select name="done" id="done">
+                <option value="true">Выполненные</option>
+                <option value="false">Не выполненные</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary">Фильтр</button>
+        </form>
+        <div class="container">
+            <div class="row" style="margin-left: -130px; margin-right: 220px;">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Задача</th>
+                        <th scope="col">Дата создания</th>
+                        <th scope="col">Статус</th>
+                        <th scope="col">Срок выполнения до</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="task: ${tasks}">
+                        <td><a th:text="${task.name}" th:href="@{/tasks/{taskId}(taskId=${task.id})}"></a></td>
+                        <td th:text="${#temporals.format(task.created, 'dd.MM.yyyy')}"></td>
+                        <td th:if="${task.done == true}">&#9989;</td>
+                        <td th:if="${task.done == false}">Ожидание выполнения</td>
+                        <td th:text="${#temporals.format(task.completion, 'dd.MM.yyyy')}"></td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package ru.trainee.slepchenko.todo.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -9,13 +10,12 @@ import ru.trainee.slepchenko.todo.filter.AddUserModel;
 import ru.trainee.slepchenko.todo.model.Task;
 import ru.trainee.slepchenko.todo.model.User;
 import ru.trainee.slepchenko.todo.service.CategoryService;
-import ru.trainee.slepchenko.todo.service.PriorityService;
 import ru.trainee.slepchenko.todo.service.TaskService;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -25,33 +25,30 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    private final PriorityService priorityService;
-
     private final CategoryService categoryService;
 
     @GetMapping("/allTasks")
     public String tasks(Model model, HttpSession session) {
         AddUserModel.checkInMenu(model, session);
         model.addAttribute("tasks", taskService.findAll());
-        model.addAttribute("priorities", priorityService.findAll());
         model.addAttribute("categories", categoryService.findAll());
         return "tasks/tasks";
     }
 
-    @GetMapping("/newTasks")
-    public String newTasks(Model model, HttpSession session) {
-        AddUserModel.checkInMenu(model, session);
-        model.addAttribute("tasks", taskService.findNew());
-        model.addAttribute("priorities", priorityService.findAll());
-        model.addAttribute("categories", categoryService.findAll());
-        return "tasks/tasks";
-    }
+    @GetMapping("/filter")
+    public String filterTasks(@RequestParam String period,
+                              @RequestParam (required = false, defaultValue = "false") String done,
+                              Model model) {
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = switch (period) {
+            case "week" -> today.plusDays(7);
+            case "month" -> today.plusMonths(1);
+            default -> today;
+        };
 
-    @GetMapping("/doneTasks")
-    public String doneTasks(Model model, HttpSession session) {
-        AddUserModel.checkInMenu(model, session);
-        model.addAttribute("tasks", taskService.findDone());
-        model.addAttribute("priorities", priorityService.findAll());
+        boolean isDone = done.equals("true");
+        Collection<Task> tasks = taskService.findByDateAndStatus(today, endDate, isDone);
+        model.addAttribute("tasks", tasks);
         model.addAttribute("categories", categoryService.findAll());
         return "tasks/tasks";
     }
@@ -63,22 +60,18 @@ public class TaskController {
 
     @PostMapping("/save")
     public String save(@ModelAttribute Task task,
-                       @RequestParam(name = "priority_status", defaultValue = "false") boolean isUrgentlyTask,
+                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate completion,
                        @RequestParam(name = "categories", required = false) String[] categoryIds,
                        Model model, HttpSession session) {
         AddUserModel.checkInMenu(model, session);
         task.setUser((User) session.getAttribute("user"));
-
+        task.setCompletion(completion);
         if (categoryIds != null && categoryIds.length != 0) {
             task.setCategories(categoryService.findNecessaryCategories(categoryIds));
         } else {
             task.setCategories(new ArrayList<>());
         }
-        if (isUrgentlyTask) {
-            task.setPriority(priorityService.findPriorityByName("urgently").get());
-        } else {
-            task.setPriority(priorityService.findPriorityByName("normal").get());
-        }
+
         taskService.save(task);
         return "redirect:/tasks/allTasks";
     }
@@ -93,14 +86,20 @@ public class TaskController {
         Task task = optionalTask.get();
         model.addAttribute("task", task);
         model.addAttribute("responsible", task.getUser().getName());
-        model.addAttribute("priority", task.getPriority().getName());
         model.addAttribute("categories", task.getCategories());
+
         return "tasks/task";
     }
 
     @GetMapping("/changeStatus/{id}")
-    public String changeStatus(@PathVariable int id) {
-        boolean isChangedStatus = taskService.changeStatusToTrue(id);
+    public String changeStatus(Model model, @PathVariable int id) {
+        Optional<Task> taskOptional = taskService.findById(id);
+        if (taskOptional.isEmpty()) {
+            model.addAttribute("Задача не найдена");
+            return "errors/404";
+        }
+        boolean status = !taskOptional.get().isDone();
+        boolean isChangedStatus = taskService.changeStatus(id, status);
         if (!isChangedStatus) {
             return "tasks/tasks";
         }
@@ -124,11 +123,6 @@ public class TaskController {
                          @ModelAttribute Task task,
                          @RequestParam(name = "priority_status", defaultValue = "false") boolean isUrgentlyTask) {
         AddUserModel.checkInMenu(model, session);
-        if (isUrgentlyTask) {
-            task.setPriority(priorityService.findPriorityByName("urgently").get());
-        } else {
-            task.setPriority(priorityService.findPriorityByName("normal").get());
-        }
         boolean isUpdated = taskService.update(task);
         if (!isUpdated) {
             return "tasks/tasks";
